@@ -5,7 +5,7 @@ import { analyze, compareSnapshots, RULE_IDS, RULE_PACK, buildReport, parseInput
 import { GOLDEN, GOLDEN_ORACLE, CLEAN, EMPTY, AMBIGUOUS, BOUNDARY, URL_LIKE, fixtureText } from '../fixtures/index.js';
 
 function run(fixture) {
-  const r = analyze(fixtureText(fixture));
+  const r = analyze(fixtureText(fixture), { provenance: 'bundled-synthetic-fixture' });
   assert.equal(r.ok, true, JSON.stringify(r.errors));
   return r.report;
 }

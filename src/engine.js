@@ -4,7 +4,15 @@ import { parseInput, LIMITS, SCHEMA_VERSION, RULE_VERSION } from './schema.js';
 import { parseUtcTimestamp } from './dates.js';
 import { RULE_PACK, RULE_IDS, pairKey, evaluateObservation } from './rules.js';
 import { addOrThrow, differenceOrThrow, OverflowError } from './integers.js';
-import { deepFreeze, SYNTHETIC_NOTICE } from './report.js';
+import { deepFreeze, SYNTHETIC_NOTICE, PROVENANCE, FIXTURE_PROVENANCE, USER_PROVENANCE } from './report.js';
+
+/** Resolve the caller-chosen provenance key. Missing means unverified; an unknown key is a programming error. */
+function resolveProvenance(provenance = USER_PROVENANCE) {
+  if (typeof provenance !== 'string' || !Object.hasOwn(PROVENANCE, provenance)) {
+    throw new TypeError(`provenance must be one of ${Object.keys(PROVENANCE).join(', ')}`);
+  }
+  return provenance;
+}
 
 function compareStrings(a, b) {
   return a < b ? -1 : a > b ? 1 : 0;
@@ -22,7 +30,8 @@ function sortedBy(records, key) {
  * Build a frozen report from validated data (the output of parseInput / validate).
  * Returns { ok: true, report } or { ok: false, errors } when checked arithmetic fails.
  */
-export function buildReport(data) {
+export function buildReport(data, { provenance } = {}) {
+  provenance = resolveProvenance(provenance);
   const snapshotEpoch = parseUtcTimestamp(data.snapshotAt);
   if (snapshotEpoch === null) throw new TypeError('buildReport requires validated data (invalid snapshotAt)');
   try {
@@ -90,10 +99,12 @@ export function buildReport(data) {
     };
 
     const report = {
-      reportVersion: 1,
+      reportVersion: 2,
       product: 'AquaSentinel vertical slice',
-      dataLabel: 'SYNTHETIC DEMO DATA',
-      syntheticNotice: SYNTHETIC_NOTICE,
+      provenance,
+      dataLabel: PROVENANCE[provenance].dataLabel,
+      dataNotice: PROVENANCE[provenance].notice,
+      syntheticNotice: provenance === FIXTURE_PROVENANCE ? SYNTHETIC_NOTICE : null,
       schemaVersion: SCHEMA_VERSION,
       ruleVersion: RULE_VERSION,
       rulePack: {
@@ -125,11 +136,15 @@ export function buildReport(data) {
   }
 }
 
-/** Raw text in, frozen report or error list out. Never throws for bad input. */
-export function analyze(text) {
+/**
+ * Raw text in, frozen report or error list out. Never throws for bad input.
+ * `provenance` is chosen by the calling code path, never read from the text; it defaults to unverified.
+ */
+export function analyze(text, { provenance } = {}) {
+  provenance = resolveProvenance(provenance);
   const parsed = parseInput(text);
   if (!parsed.ok) return parsed;
-  return buildReport(parsed.data);
+  return buildReport(parsed.data, { provenance });
 }
 
 /** Compare two reports by finding key. Returns sorted arrays of findingIds. */

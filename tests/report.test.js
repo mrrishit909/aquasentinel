@@ -12,7 +12,7 @@ const sha256 = (text) => createHash('sha256').update(text, 'utf8').digest('hex')
 const AT = '2026-11-03T13:00:00Z';
 
 function run(fixture) {
-  const r = analyze(fixtureText(fixture));
+  const r = analyze(fixtureText(fixture), { provenance: 'bundled-synthetic-fixture' });
   assert.equal(r.ok, true, JSON.stringify(r.errors));
   return r.report;
 }

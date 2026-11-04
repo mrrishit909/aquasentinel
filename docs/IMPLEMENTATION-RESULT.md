@@ -62,3 +62,13 @@ None. No test was weakened, edited or deleted. The spec's literal oracle (5 obse
 - Review layer and comparison state are in-memory only; no persistence, accounts, tenant isolation or access control (the spec defers these to before any non-demo deployment).
 - JSON export depends on `crypto.subtle` for the source hash; the UI refuses to export without it rather than inventing a hash.
 - No git operations, CI files, dependencies or network activity were introduced.
+
+## Provenance labelling change (2026-11-04)
+
+- Problem: every accepted input (bundled fixture, local JSON file, pasted JSON) was labelled `SYNTHETIC DEMO DATA` in the report, the workbench and both exports. Input never leaves the tab; this was a labelling defect, not a data transfer.
+- Change: `analyze(text, { provenance })` stamps `provenance`, `dataLabel` and `dataNotice` on the frozen report; `buildExport` and `exportCsv` read them from the report. Only the workbench fixture loader passes `bundled-synthetic-fixture`; file and paste pass `unverified-user-supplied`, which is also the default. Nothing inside the input JSON can set provenance (unknown keys are rejected).
+- Versions: `schemaVersion` `aqua-demo-1` and `ruleVersion` `aqua-review-1` unchanged; `reportVersion` 1 → 2, `exportVersion` 1 → 2. Compatibility rules are in the README section "Contract versions and compatibility".
+- Tests: `tests/provenance.test.js` covers both paths through JSON and CSV export, the unverified default, rejection of self-asserted label keys, invalid provenance values, v1-shaped reports, and the workbench call-site wiring (static check).
+- The label describes how data was loaded. It does not detect or prevent real data.
+- Not yet run: the new and updated tests were written but not executed in this session (running node/npm required approval that was not available). `npm test` and `npm run build` are pending; until the build runs, `dist/` still ships the old always-synthetic labelling. No browser check was done.
+- Left as is (outside this change): the landing page `index.html` and the README headline still describe the slice as synthetic-only, and the workbench meta description says "synthetic".

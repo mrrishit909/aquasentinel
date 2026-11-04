@@ -35,7 +35,9 @@ test('formatters are pure and bounded', () => {
   assert.equal(formatAge(-1), 'n/a');
   assert.equal(formatBytes(512), '512 B');
   assert.equal(formatBytes(1048576), '1.00 MiB');
-  assert.equal(exportFileName('2026-11-03T13:00:00Z', 'json'), 'aquasentinel-synthetic-20261103T130000Z.json');
+  assert.equal(exportFileName('2026-11-03T13:00:00Z', 'json', 'bundled-synthetic-fixture'), 'aquasentinel-synthetic-20261103T130000Z.json');
+  assert.equal(exportFileName('2026-11-03T13:00:00Z', 'csv', 'unverified-user-supplied'), 'aquasentinel-unverified-20261103T130000Z.csv');
+  assert.equal(exportFileName('2026-11-03T13:00:00Z', 'csv'), 'aquasentinel-unverified-20261103T130000Z.csv');
   assert.deepEqual(sortErrors([{ path: 'b', code: 'X' }, { path: 'a', code: 'Y' }]).map((e) => e.path), ['a', 'b']);
 });
 

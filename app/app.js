@@ -1,6 +1,8 @@
 // Browser entry for the AquaSentinel synthetic workbench. Wires the REAL engine in src/ to the DOM.
 // Safety rules: DOM is built with createElement/textContent only (no innerHTML with data), no eval,
-// no network calls of any kind. Everything runs on the imported text in this tab. SYNTHETIC DEMO DATA ONLY.
+// no network calls of any kind. Everything runs on the imported text in this tab. Bundled fixtures are labelled
+// synthetic; a local file or pasted text is labelled unverified user-supplied data. Provenance comes from which
+// control was used (code path), never from anything inside the JSON.
 import {
   analyze,
   compareSnapshots,
@@ -9,7 +11,9 @@ import {
   LIMITS,
   SCHEMA_VERSION,
   RULE_VERSION,
-  SYNTHETIC_NOTICE,
+  FIXTURE_PROVENANCE,
+  USER_PROVENANCE,
+  reportProvenance,
   DISPOSITIONS,
   createReviewLayer,
   addNote,
@@ -108,8 +112,8 @@ function renderErrors(errors) {
 
 // ---------- import ----------
 
-async function runImport(text, sourceLabel) {
-  const result = analyze(text);
+async function runImport(text, sourceLabel, provenance) {
+  const result = analyze(text, { provenance });
   if (!result.ok) {
     renderErrors(result.errors);
     setStatus(`${sourceLabel} rejected atomically with ${result.errors.length} error(s). Previous dataset preserved.`, 'bad');
@@ -125,7 +129,7 @@ async function runImport(text, sourceLabel) {
   renderErrors([]);
   renderAll();
   const hash = state.sourceHash ? `sha256 ${state.sourceHash.slice(0, 16)}…` : 'sha256 unavailable in this browser context';
-  setStatus(`${sourceLabel} accepted: ${formatBytes(state.sourceBytes)}, ${hash}. Frozen report built with ${RULE_VERSION}.`, 'good');
+  setStatus(`${sourceLabel} accepted as ${state.report.dataLabel}: ${formatBytes(state.sourceBytes)}, ${hash}. Frozen report built with ${RULE_VERSION}.`, 'good');
 }
 
 function loadFixture() {
@@ -134,7 +138,7 @@ function loadFixture() {
   if (!fixture) return;
   const text = fixtureText(fixture.data);
   $('input-text').value = text;
-  runImport(text, `Fixture "${fixture.name}"`);
+  runImport(text, `Fixture "${fixture.name}"`, FIXTURE_PROVENANCE);
 }
 
 async function loadFile(event) {
@@ -148,13 +152,26 @@ async function loadFile(event) {
   }
   const text = await file.text();
   $('input-text').value = text;
-  await runImport(text, `File "${file.name}"`);
+  await runImport(text, `File "${file.name}"`, USER_PROVENANCE);
   event.target.value = '';
 }
 
 // ---------- rendering ----------
 
+const NO_DATA_NOTICE =
+  'No dataset loaded. Bundled fixtures are synthetic demo data; a local JSON file or pasted JSON is shown as unverified user-supplied data. ' +
+  'Labels describe how data was loaded; they do not detect or prevent real data.';
+
+function renderProvenance() {
+  const report = state.report;
+  const banner = $('data-banner');
+  banner.dataset.provenance = report ? report.provenance : 'none';
+  banner.textContent = report ? report.dataNotice : NO_DATA_NOTICE;
+  $('notice').textContent = report ? report.dataNotice : NO_DATA_NOTICE;
+}
+
 function renderAll() {
+  renderProvenance();
   renderSummary();
   renderFindings();
   renderEvidence();
@@ -176,7 +193,7 @@ function renderSummary() {
   clear(rules);
   const report = state.report;
   if (!report) {
-    $('snapshot-line').textContent = 'No dataset loaded. Load a synthetic fixture, pick a JSON file, or paste JSON.';
+    $('snapshot-line').textContent = 'No dataset loaded. Load a synthetic fixture, or pick a JSON file or paste JSON (shown as unverified user-supplied data).';
     return;
   }
   const s = report.summary;
@@ -383,7 +400,7 @@ function renderCompare() {
   }
   const diff = compareSnapshots(state.previousReport, state.report);
   node.append(
-    el('p', { text: `Previous snapshot ${state.previousReport.snapshotAt} → current ${state.report.snapshotAt}` }),
+    el('p', { text: `Previous snapshot ${state.previousReport.snapshotAt} (${state.previousReport.dataLabel}) → current ${state.report.snapshotAt} (${state.report.dataLabel})` }),
     el('dl', { class: 'fields' }, [
       field('added', `${diff.added.length}${diff.added.length ? `: ${diff.added.join(', ')}` : ''}`),
       field('removed', `${diff.removed.length}${diff.removed.length ? `: ${diff.removed.join(', ')}` : ''}`),
@@ -428,7 +445,7 @@ function onExportJson() {
     $('export-status').textContent = result.errors.map((e) => `${e.code}: ${e.message}`).join('; ');
     return;
   }
-  download(result.text, exportFileName(generatedAt, 'json'), 'application/json');
+  download(result.text, exportFileName(generatedAt, 'json', reportProvenance(state.report)), 'application/json');
   $('export-status').textContent = `JSON export written (${formatBytes(result.bytes)}; exact identifiers preserved; includes sourceHash, snapshot, rule version, findings, notes, decisions).`;
 }
 
@@ -439,7 +456,7 @@ function onExportCsv() {
     $('export-status').textContent = result.errors.map((e) => `${e.code}: ${e.message}`).join('; ');
     return;
   }
-  download(result.text, exportFileName(nowUtc(), 'csv'), 'text/csv');
+  download(result.text, exportFileName(nowUtc(), 'csv', reportProvenance(state.report)), 'text/csv');
   $('export-status').textContent = `CSV export written (${formatBytes(result.bytes)}; formula-leading cells neutralized with a leading apostrophe).`;
 }
 
@@ -453,7 +470,6 @@ function populateStatic() {
   for (const ruleId of RULE_IDS) ruleSelect.append(el('option', { value: ruleId, text: ruleId }));
   const dispositions = $('decision-select');
   for (const d of DISPOSITIONS) dispositions.append(el('option', { value: d, text: d }));
-  $('notice').textContent = SYNTHETIC_NOTICE;
   $('meta-versions').textContent = `schemaVersion ${SCHEMA_VERSION} · ruleVersion ${RULE_VERSION} · stale threshold ${RULE_PACK.staleThresholdSeconds} s`;
   $('meta-provenance').textContent = RULE_PACK.provenance;
   $('meta-limits').textContent = `Limits: ${formatBytes(LIMITS.maxInputBytes)} input, ${LIMITS.maxAssets} assets, ${LIMITS.maxApprovals} approvals, ${LIMITS.maxObservations} observations, ${LIMITS.maxIdentifierLength}-character identifiers, ${LIMITS.maxNoteLength}-character notes, nesting depth ${LIMITS.maxDepth}, ${formatBytes(LIMITS.maxExportBytes)} export.`;
@@ -463,7 +479,8 @@ function boot() {
   populateStatic();
   $('load-fixture').addEventListener('click', loadFixture);
   $('input-file').addEventListener('change', loadFile);
-  $('run-text').addEventListener('click', () => runImport($('input-text').value, 'Pasted text'));
+  // The text box is user-editable, so this path is always unverified, even if a fixture filled it.
+  $('run-text').addEventListener('click', () => runImport($('input-text').value, 'Pasted text', USER_PROVENANCE));
   for (const id of ['filter-rule', 'filter-query', 'filter-unknown', 'filter-missing']) $(id).addEventListener('input', renderFindings);
   $('note-add').addEventListener('click', onAddNote);
   $('decision-record').addEventListener('click', onRecordDecision);

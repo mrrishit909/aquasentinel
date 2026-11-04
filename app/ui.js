@@ -1,5 +1,5 @@
 // Pure, testable UI helpers. No DOM access here. Isomorphic ESM.
-import { csvCell } from '../src/report.js';
+import { csvCell, FIXTURE_PROVENANCE } from '../src/report.js';
 
 export { csvCell };
 
@@ -61,8 +61,9 @@ export function emptyFindingsMessage(summary, shownCount) {
   return 'No findings match the current filters.';
 }
 
-/** Build a download file name from an injected timestamp (no clock access here). */
-export function exportFileName(generatedAt, extension) {
+/** Build a download file name from an injected timestamp (no clock access here). Only bundled fixtures say "synthetic". */
+export function exportFileName(generatedAt, extension, provenance) {
   const stamp = String(generatedAt).replace(/[^0-9TZ]/g, '');
-  return `aquasentinel-synthetic-${stamp}.${extension}`;
+  const kind = provenance === FIXTURE_PROVENANCE ? 'synthetic' : 'unverified';
+  return `aquasentinel-${kind}-${stamp}.${extension}`;
 }

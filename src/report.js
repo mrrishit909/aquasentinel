@@ -9,6 +9,27 @@ export const SYNTHETIC_NOTICE =
   'SYNTHETIC DEMO DATA. Fictional utility, fictional assets, approvals and observations. ' +
   'Not real infrastructure, not a security assessment, no regulatory or compliance meaning.';
 
+export const UNVERIFIED_NOTICE =
+  'UNVERIFIED USER-SUPPLIED DATA. These records came from a local file or pasted text in this browser tab; ' +
+  'their origin, accuracy and authorization have not been verified, and this label does not detect or prevent real data. ' +
+  'The rule pack is fictional. Not a security assessment, no regulatory or compliance meaning.';
+
+/**
+ * Data provenance is decided by the calling code path (bundled fixture vs. local file/paste), never by the
+ * input JSON. Missing provenance means unverified; analyze() throws on any other unknown key.
+ */
+export const PROVENANCE = deepFreeze({
+  'bundled-synthetic-fixture': { dataLabel: 'SYNTHETIC DEMO DATA', notice: SYNTHETIC_NOTICE },
+  'unverified-user-supplied': { dataLabel: 'UNVERIFIED USER-SUPPLIED DATA', notice: UNVERIFIED_NOTICE },
+});
+export const FIXTURE_PROVENANCE = 'bundled-synthetic-fixture';
+export const USER_PROVENANCE = 'unverified-user-supplied';
+
+/** Provenance key of a report; reports without one (reportVersion 1) are treated as unverified. */
+export function reportProvenance(report) {
+  return report && report.provenance === FIXTURE_PROVENANCE ? FIXTURE_PROVENANCE : USER_PROVENANCE;
+}
+
 export const DISPOSITIONS = Object.freeze(['open', 'reviewed', 'assigned', 'deferred']);
 
 export function deepFreeze(value) {
@@ -104,11 +125,16 @@ export function buildExport(report, { generatedAt, sourceHash, notes = [], decis
     throw new TypeError('sourceHash must be a lowercase SHA-256 hex digest of the raw input text');
   }
   if (!Array.isArray(notes) || !Array.isArray(decisions)) throw new TypeError('notes and decisions must be arrays');
+  const provenance = reportProvenance(report);
+  const { dataLabel, notice } = PROVENANCE[provenance];
   return {
-    exportVersion: 1,
+    exportVersion: 2,
     product: 'AquaSentinel vertical slice',
-    dataLabel: 'SYNTHETIC DEMO DATA',
-    syntheticNotice: SYNTHETIC_NOTICE,
+    provenance,
+    dataLabel,
+    dataNotice: notice,
+    // Kept for exportVersion 1 readers; null whenever the data is not a bundled synthetic fixture.
+    syntheticNotice: provenance === FIXTURE_PROVENANCE ? SYNTHETIC_NOTICE : null,
     schemaVersion: SCHEMA_VERSION,
     ruleVersion: RULE_VERSION,
     rulePack: {
@@ -189,11 +215,12 @@ export const CSV_COLUMNS = Object.freeze([
 
 export function buildCsvRows(report, layer = createReviewLayer()) {
   const ages = report.summary.ageSecondsByObservation;
+  const { dataLabel } = PROVENANCE[reportProvenance(report)];
   return report.findings.map((f) => {
     const decision = currentDecision(layer, f.findingId);
     const notes = notesFor(layer, f.findingId).map((n) => n.text).join(' | ');
     return [
-      'SYNTHETIC DEMO DATA',
+      dataLabel,
       f.findingId,
       f.observationId,
       f.ruleId,

@@ -43,22 +43,42 @@ Per observation, rules run independently: `UNKNOWN_ASSET` (assetId absent from r
 
 ## Output
 
-`analyze(text)` returns `{ ok: true, report }` where `report` is **deeply frozen** and contains `reportVersion`, `dataLabel: "SYNTHETIC DEMO DATA"`, `syntheticNotice`, `schemaVersion`, `ruleVersion`, `rulePack` (version, provenance text, stale threshold, rule IDs), `limits`, `snapshotAt`, the normalized sorted `input`, per-observation rows (`ageSeconds`, `assetKnown`, `flagged`, `ruleIds`), `findings` (each with `message`, `details` and `evidence: { observation, asset, approvals }`), and `summary` (counts, `countsByRule`, `ageSecondsByObservation`).
+`analyze(text, { provenance })` returns `{ ok: true, report }` where `report` is **deeply frozen** and contains `reportVersion` (`2`), `provenance`, `dataLabel`, `dataNotice`, `syntheticNotice`, `schemaVersion`, `ruleVersion`, `rulePack` (version, provenance text, stale threshold, rule IDs), `limits`, `snapshotAt`, the normalized sorted `input`, per-observation rows (`ageSeconds`, `assetKnown`, `flagged`, `ruleIds`), `findings` (each with `message`, `details` and `evidence: { observation, asset, approvals }`), and `summary` (counts, `countsByRule`, `ageSecondsByObservation`).
+
+### Data provenance
+
+`provenance` is chosen by the **calling code path**, never read from the input text. The input schema rejects unknown keys, so a JSON field such as `"dataLabel"`, `"provenance"` or `"synthetic"` is rejected with `UNKNOWN_KEY` rather than honoured.
+
+| `provenance` | `dataLabel` | `syntheticNotice` | Used by |
+|---|---|---|---|
+| `bundled-synthetic-fixture` | `SYNTHETIC DEMO DATA` | the synthetic notice | the workbench fixture loader only |
+| `unverified-user-supplied` (default) | `UNVERIFIED USER-SUPPLIED DATA` | `null` | local JSON file, pasted JSON, and any caller that passes nothing |
+
+Any other value throws `TypeError`. Loading a fixture and then pressing "Validate and run" on the (editable) text box is deliberately labelled unverified. The label records how data entered the page; it does not detect or prevent real data, and accepted input stays in the tab (no network call).
 
 A separate review layer (`createReviewLayer`, `addNote`, `recordDecision`) holds notes and dispositions (`open`, `reviewed`, `assigned`, `deferred`) without ever modifying the report. `compareSnapshots(a, b)` diffs finding keys between two reports.
 
 ## Exports
 
-- **JSON** (`buildExport` + `serializeExport`): `exportVersion`, labels, versions, rule-pack provenance, caller-supplied `generatedAt` and `sourceHash` (SHA-256 hex of the raw input text), snapshot, input, summary, observations, findings, notes, decisions. Exact identifiers are preserved. 10 MiB cap.
-- **CSV** (`exportCsv`): one row per finding with disposition, reviewer and notes; RFC 4180 quoting; cells starting with `=`, `+`, `-`, `@`, tab or CR are prefixed with `'` to neutralize spreadsheet formulas. 10 MiB cap.
+- **JSON** (`buildExport` + `serializeExport`): `exportVersion` (`2`), `provenance`, `dataLabel`, `dataNotice`, `syntheticNotice`, versions, rule-pack provenance, caller-supplied `generatedAt` and `sourceHash` (SHA-256 hex of the raw input text), snapshot, input, summary, observations, findings, notes, decisions. Exact identifiers are preserved. 10 MiB cap.
+- **CSV** (`exportCsv`): one row per finding; the first column `dataLabel` carries the report's provenance label; then disposition, reviewer and notes; RFC 4180 quoting; cells starting with `=`, `+`, `-`, `@`, tab or CR are prefixed with `'` to neutralize spreadsheet formulas. 10 MiB cap.
+
+### Contract versions and compatibility
+
+- Unchanged: input `schemaVersion` `aqua-demo-1`, rule pack `ruleVersion` `aqua-review-1`, rule logic, findings, summary.
+- `reportVersion` 1 → 2 and `exportVersion` 1 → 2, because `dataLabel` changed meaning (it was always `SYNTHETIC DEMO DATA`; it now depends on provenance).
+- v2 is additive for JSON readers: every v1 key is still present with the same type except `syntheticNotice`, which is now `null` for unverified data so an old reader never sees a false synthetic claim. New keys: `provenance`, `dataNotice`.
+- CSV header and column order are unchanged; only the `dataLabel` cell value can differ.
+- A report object without `provenance` (v1 shape) is exported as unverified. Existing v1 export files are not rewritten; their `SYNTHETIC DEMO DATA` label is not evidence of provenance.
+- `analyze(text)` with no option now labels the result unverified (it previously said synthetic). Callers wanting the synthetic label must pass `{ provenance: 'bundled-synthetic-fixture' }`, and should only do so for bundled fixtures.
 
 ## Workbench (`/app/`)
 
-Static HTML plus ESM modules that import the real engine: load a labelled synthetic fixture, choose a local JSON file, or paste JSON; see validation errors or the frozen report's counts; filter findings by rule, entity text, unknown assets or missing approvals; open a finding to see the observation, asset and approval records behind it plus its independent sibling findings; add notes and record dispositions; compare with the previously imported snapshot; export JSON and safe CSV. The DOM is built with `createElement`/`textContent` only; there is no `innerHTML` with data, no `eval`, no network call, and no external fonts, scripts or URLs. The server sets a `connect-src 'none'` content security policy.
+Static HTML plus ESM modules that import the real engine: load a labelled synthetic fixture, choose a local JSON file, or paste JSON (file and pasted data are shown, in the banner, status line and exports, as unverified user-supplied data); see validation errors or the frozen report's counts; filter findings by rule, entity text, unknown assets or missing approvals; open a finding to see the observation, asset and approval records behind it plus its independent sibling findings; add notes and record dispositions; compare with the previously imported snapshot; export JSON and safe CSV. The DOM is built with `createElement`/`textContent` only; there is no `innerHTML` with data, no `eval`, no network call, and no external fonts, scripts or URLs. The server sets a `connect-src 'none'` content security policy.
 
 ## Limitations (explicit)
 
-- Synthetic data only. Not validated against any real utility, standard, regulation or threat model, and not suitable for one.
+- Bundled fixtures are synthetic. The workbench also accepts any local JSON that passes the schema; such data is labelled unverified user-supplied data, but nothing stops someone from entering real records. Not validated against any real utility, standard, regulation or threat model, and not suitable for one.
 - The workbench has **not** been exercised by automated browser tests in this repository; only the pure helpers (`app/ui.js`), the engine and static checks of `app/app.js` and the HTML are tested. The blocked-network evidence, independent oracle check, security review and accessibility review named in the specification's release gate have not been performed here.
 - The review layer and compare state live in page memory only; reloading the page discards them. There is no persistence, authentication, tenant isolation or access control.
 - JSON export requires `crypto.subtle` (available on `127.0.0.1` in modern browsers) for the source hash; if absent, the UI says so and refuses to export without a hash.

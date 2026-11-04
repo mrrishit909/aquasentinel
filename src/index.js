@@ -16,6 +16,11 @@ export { RULE_PACK, RULE_IDS, STALE_THRESHOLD_SECONDS, pairKey, findingIdFor, ev
 export { analyze, buildReport, compareSnapshots, compareFindings } from './engine.js';
 export {
   SYNTHETIC_NOTICE,
+  UNVERIFIED_NOTICE,
+  PROVENANCE,
+  FIXTURE_PROVENANCE,
+  USER_PROVENANCE,
+  reportProvenance,
   DISPOSITIONS,
   deepFreeze,
   createReviewLayer,
