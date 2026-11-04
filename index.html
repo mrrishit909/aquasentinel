@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AquaSentinel — synthetic evidence reconciliation slice</title>
+  <meta name="description" content="A passive, deterministic reconciliation of imported synthetic asset, approval and observation records. Synthetic demo data only; fictional rule pack; no authority of any kind.">
+  <link rel="stylesheet" href="./app/styles.css">
+</head>
+<body class="landing">
+  <p class="banner" role="status">SYNTHETIC DEMO DATA — fictional utility, fictional rule pack aqua-review-1. Not a security assessment. No regulatory, legal or operational meaning.</p>
+
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">AquaSentinel · vertical slice 0.1.0</p>
+      <h1>Reconcile what the records <span class="tide">say</span>, nothing more.</h1>
+    </div>
+    <nav aria-label="Site"><a href="./app/">Open the workbench</a></nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="lede">AquaSentinel imports three registers from a fictional water utility — assets, approvals, observations — and lists where they disagree. Every finding names the imported rows that produced it. It never says anything about exposure, severity or compromise.</p>
+      <p><a class="primary" href="./app/">Load the golden fixture in the workbench →</a></p>
+    </section>
+
+    <section class="card pair">
+      <div>
+        <h2>What it does</h2>
+        <ul>
+          <li>Validates one JSON envelope (<code>aqua-demo-1</code>) atomically: any error rejects the whole import and the previous dataset stays.</li>
+          <li>Runs the fictional rule pack <code>aqua-review-1</code>: UNKNOWN_ASSET, NO_APPROVAL, OUTSIDE_APPROVAL_WINDOW, AMBIGUOUS_APPROVAL, OWNER_MISSING, STALE_OBSERVATION.</li>
+          <li>Freezes the report; lets a reviewer add notes and dispositions without touching imported evidence.</li>
+          <li>Exports JSON (exact data, source hash, versions) and formula-safe CSV.</li>
+        </ul>
+      </div>
+      <div>
+        <h2>What it does not do</h2>
+        <ul>
+          <li>No scanning, fetching, DNS lookups, device connections, PLC writes or remediation. URL-like identifiers are plain text.</li>
+          <li>No real infrastructure data. Fixtures are labelled synthetic; the only source of the rules is the slice specification.</li>
+          <li>No legal, regulatory, clinical or security-assurance claim. A missing observation never implies safety.</li>
+          <li>No accounts, tenants, uploads or deployment. Served on 127.0.0.1 only.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>The synthetic golden fixture and its hand-computed oracle</h2>
+      <p class="muted">snapshotAt 2026-11-03T12:00:00Z. Assets A1 (owner Ops), A2 (owner null). Approvals P1 A1/V1 2026-11-01 → 2026-11-04; P2 A2/V2 2026-11-01 → 2026-11-02 (inclusive endpoints).</p>
+      <div class="table-wrap">
+        <table class="oracle">
+          <thead><tr><th>Observation</th><th>Asset / path</th><th>observedAt</th><th>Expected rule IDs</th></tr></thead>
+          <tbody>
+            <tr><td>O1</td><td>A1 / V1</td><td>2026-11-03T11:00:00Z</td><td>none</td></tr>
+            <tr><td>O2</td><td>A1 / V9</td><td>2026-11-03T11:00:00Z</td><td>NO_APPROVAL</td></tr>
+            <tr><td>O3</td><td>A9 / V9</td><td>2026-11-03T11:00:00Z</td><td>NO_APPROVAL, UNKNOWN_ASSET</td></tr>
+            <tr><td>O4</td><td>A2 / V2</td><td>2026-11-03T10:00:00Z</td><td>OUTSIDE_APPROVAL_WINDOW, OWNER_MISSING</td></tr>
+            <tr><td>O5</td><td>A1 / V1</td><td>2026-11-02T11:00:00Z</td><td>STALE_OBSERVATION</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Expected: 5 observations, 4 flagged, 1 structurally consistent, 6 findings. O5 is 90,000 seconds old; exactly 86,400 seconds is not stale.</p>
+    </section>
+
+    <section class="card">
+      <h2>Bounds</h2>
+      <p>1 MiB input · 1,000 assets · 2,000 approvals · 5,000 observations · 200-character identifiers · 2,000-character notes · nesting depth 8 · 10 MiB export. Timestamps must be real UTC calendar instants ending in <code>Z</code>; identifiers keep their exact text after ASCII-whitespace trimming, and trimming collisions are rejected.</p>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p>Synthetic vertical slice. Dependency-free Node 24 ESM engine in <code>src/</code>; this page and the workbench import that same engine. Run <code>npm test</code> for the oracle and adversarial checks, <code>npm run serve</code> for this loopback-only preview.</p>
+  </footer>
+</body>
+</html>

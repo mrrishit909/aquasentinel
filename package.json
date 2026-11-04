@@ -1,0 +1,16 @@
+{
+  "name": "aquasentinel-vertical-slice",
+  "version": "0.1.0",
+  "description": "AquaSentinel synthetic vertical slice: passive, deterministic reconciliation of imported asset, approval and observation evidence (synthetic demo data only).",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test \"tests/**/*.test.js\"",
+    "serve": "node scripts/serve.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
