@@ -3,74 +3,312 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AquaSentinel — synthetic evidence reconciliation slice</title>
-  <meta name="description" content="A passive, deterministic reconciliation of imported synthetic asset, approval and observation records. Synthetic demo data only; fictional rule pack; no authority of any kind.">
-  <link rel="stylesheet" href="./app/styles.css">
+  <title>AquaSentinel · Sheet AS-01, passive evidence reconciliation (synthetic demo)</title>
+  <meta name="description" content="AquaSentinel draws where a fictional water utility's asset register, approval windows and imported observations disagree. Passive import only. Synthetic demo data and a fictional rule pack; no security, regulatory or operational meaning.">
+  <meta name="theme-color" content="#0B1D22">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:title" content="AquaSentinel · Sheet AS-01">
+  <meta property="og:description" content="A passive reconciliation schematic of a synthetic golden fixture: 5 observations, 4 flagged, 6 evidence gaps.">
+  <link rel="stylesheet" href="./app/landing.css">
 </head>
-<body class="landing">
-  <p class="banner" role="status">SYNTHETIC DEMO DATA — fictional utility, fictional rule pack aqua-review-1. Not a security assessment. No regulatory, legal or operational meaning.</p>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
 
-  <header class="masthead">
-    <div>
-      <p class="eyebrow">AquaSentinel · vertical slice 0.1.0</p>
-      <h1>Reconcile what the records <span class="tide">say</span>, nothing more.</h1>
+  <header class="top">
+    <div class="wrap top-row">
+      <p class="mark"><svg class="mark-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M2 12H9M15 12H22"/><circle cx="12" cy="12" r="3.2"/></svg><span>AquaSentinel</span></p>
+      <p class="sheet-code">Sheet AS-01 · rev <code>aqua-review-1</code></p>
+      <nav aria-label="Primary"><a class="top-link" href="./app/">Open the workbench</a></nav>
     </div>
-    <nav aria-label="Site"><a href="./app/">Open the workbench</a></nav>
+    <p class="synthetic wrap"><strong>Synthetic demo data.</strong> Fictional utility, fictional identifiers, fictional rule pack <code>aqua-review-1</code>. Not a security assessment; no regulatory, legal or operational meaning.</p>
   </header>
 
-  <main>
-    <section class="hero">
-      <p class="lede">AquaSentinel imports three registers from a fictional water utility — assets, approvals, observations — and lists where they disagree. Every finding names the imported rows that produced it. It never says anything about exposure, severity or compromise.</p>
-      <p><a class="primary" href="./app/">Load the golden fixture in the workbench →</a></p>
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="hero-h">
+      <p class="eyebrow">Passive evidence reconciliation · vertical slice 0.1.0</p>
+      <h1 id="hero-h">What was <span class="c-reg">approved</span>, drawn against what was <span class="c-imp">observed</span>.</h1>
+      <div class="hero-foot">
+        <p class="lede">AquaSentinel reads three registers from a fictional water utility (assets, approval windows and imported observations) and draws every place they disagree. Each mark on the sheet below is placed from a timestamp in the synthetic golden fixture. Nothing is scanned, fetched or connected.</p>
+        <div class="cta-row">
+          <a class="cta" href="./app/">Open the workbench <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="quiet" href="#sheet">Read sheet AS-01</a>
+        </div>
+      </div>
     </section>
 
-    <section class="card pair">
-      <div>
-        <h2>What it does</h2>
-        <ul>
-          <li>Validates one JSON envelope (<code>aqua-demo-1</code>) atomically: any error rejects the whole import and the previous dataset stays.</li>
-          <li>Runs the fictional rule pack <code>aqua-review-1</code>: UNKNOWN_ASSET, NO_APPROVAL, OUTSIDE_APPROVAL_WINDOW, AMBIGUOUS_APPROVAL, OWNER_MISSING, STALE_OBSERVATION.</li>
-          <li>Freezes the report; lets a reviewer add notes and dispositions without touching imported evidence.</li>
-          <li>Exports JSON (exact data, source hash, versions) and formula-safe CSV.</li>
+    <figure class="sheet wrap" id="sheet" aria-labelledby="sheet-cap">
+      <div class="sheet-frame">
+        <!-- Landscape drawing: 5 units = 1 h; x 340 = 2026-11-01T00:00Z; snapshot x 640; stale edge x 520. -->
+        <svg class="sv sheet-l" viewBox="0 0 1000 600" role="img" aria-labelledby="sheet-t-l sheet-d-l" focusable="false">
+          <title id="sheet-t-l">Reconciliation schematic of the synthetic golden fixture</title>
+          <desc id="sheet-d-l">Asset register on the left: A1 with owner Ops, A2 with owner null. Path IDs on the right. Two approvals are on record: P1 joins A1 to V1 from 1 November 00:00 to 4 November 00:00 UTC, and P2 joins A2 to V2 from 1 November 00:00 to 2 November 00:00 UTC. Five imported observations sit on a linear UTC time scale with the snapshot at 3 November 12:00. O1 on A1 and V1 at 3 November 11:00 is structurally consistent. O5 on A1 and V1 at 2 November 11:00 is older than 86,400 seconds: STALE_OBSERVATION. O4 on A2 and V2 at 3 November 10:00 falls after P2 ends: OUTSIDE_APPROVAL_WINDOW, and A2 has no owner: OWNER_MISSING. O2 pairs A1 with V9, which has no approval on record: NO_APPROVAL. O3 pairs A9, which is not in the asset register, with V9: NO_APPROVAL and UNKNOWN_ASSET.</desc>
+          <defs>
+            <pattern id="hatch-l" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="hatch" x1="0" y1="0" x2="0" y2="9"/></pattern>
+          </defs>
+
+          <g class="layer-time">
+            <rect class="frame" x="8" y="8" width="984" height="584"/>
+            <path class="frame-tick" d="M250 8V18M500 8V18M750 8V18M8 200H18M8 400H18"/>
+            <text class="t-zone" x="129" y="24">A</text><text class="t-zone" x="375" y="24">B</text><text class="t-zone" x="625" y="24">C</text><text class="t-zone" x="871" y="24">D</text>
+            <text class="t-zone" x="20" y="108">1</text><text class="t-zone" x="20" y="308">2</text><text class="t-zone" x="20" y="508">3</text>
+
+            <rect x="340" y="80" width="180" height="450" fill="url(#hatch-l)"/>
+            <line class="stale-edge" x1="520" y1="80" x2="520" y2="530"/>
+            <text class="t-axis halo" x="348" y="522">OLDER THAN 86,400 s AT SNAPSHOT</text>
+
+            <line class="axis" x1="340" y1="80" x2="700" y2="80"/>
+            <path class="axis" d="M340 80V90M460 80V90M580 80V90M700 80V90M370 80V85M400 80V85M430 80V85M490 80V85M520 80V85M550 80V85M610 80V85M640 80V85M670 80V85"/>
+            <text class="t-axis" x="340" y="72" text-anchor="middle">11-01</text>
+            <text class="t-axis" x="460" y="72" text-anchor="middle">11-02</text>
+            <text class="t-axis" x="580" y="72" text-anchor="middle">11-03</text>
+            <text class="t-axis" x="700" y="72" text-anchor="middle">11-04</text>
+
+            <line class="snap-line" x1="640" y1="50" x2="640" y2="530"/>
+            <text class="t-snap" x="648" y="46">SNAPSHOT 11-03 12:00Z</text>
+
+            <text class="t-head" x="40" y="98">ASSET REGISTER</text>
+            <text class="t-head" x="800" y="98">PATH IDS</text>
+
+            <path class="axis" d="M340 560H460M340 554V566M460 554V566"/>
+            <text class="t-axis" x="470" y="564">24 h · UTC, linear, 5 units = 1 h, placed from fixture timestamps</text>
+            <text class="t-syn" x="40" y="564">SYNTHETIC · FICTIONAL</text>
+          </g>
+
+          <g class="layer-reg">
+            <line class="reg-line" x1="200" y1="140" x2="800" y2="140"/>
+            <line class="reg-line" x1="200" y1="260" x2="800" y2="260"/>
+            <rect class="win" x="340" y="134" width="360" height="12"/>
+            <rect class="win" x="340" y="254" width="120" height="12"/>
+            <text class="t-win halo" x="346" y="166">P1 · 11-01 00:00Z to 11-04 00:00Z</text>
+            <text class="t-win halo" x="346" y="286">P2 · 11-01 00:00Z to 11-02 00:00Z</text>
+
+            <rect class="node-reg" x="40" y="110" width="160" height="76"/>
+            <text class="t-id" x="56" y="142">A1</text><text class="t-meta" x="56" y="168">owner Ops</text>
+            <rect class="node-reg" x="40" y="222" width="160" height="76"/>
+            <text class="t-id" x="56" y="254">A2</text><text class="t-meta" x="56" y="280">owner <tspan class="t-null">null</tspan></text>
+            <rect class="node-reg" x="800" y="110" width="160" height="60" rx="30"/>
+            <text class="t-id" x="824" y="138">V1</text><text class="t-meta" x="824" y="157">P1 on record</text>
+            <rect class="node-reg" x="800" y="230" width="160" height="60" rx="30"/>
+            <text class="t-id" x="824" y="258">V2</text><text class="t-meta" x="824" y="277">P2 on record</text>
+            <circle class="port" cx="200" cy="140" r="3"/><circle class="port" cx="800" cy="140" r="3"/>
+            <circle class="port" cx="200" cy="260" r="3"/><circle class="port" cx="800" cy="260" r="3"/>
+          </g>
+
+          <g class="layer-imp">
+            <path class="imp-line" d="M200 170H250V252A8 8 0 0 1 250 268V380H800"/>
+            <path class="imp-line" d="M200 480H800"/>
+            <rect class="node-imp" x="40" y="442" width="160" height="76"/>
+            <text class="t-id" x="56" y="474">A9</text><text class="t-meta" x="56" y="500">not in asset register</text>
+            <rect class="node-imp" x="800" y="350" width="160" height="160" rx="30"/>
+            <text class="t-id" x="824" y="420">V9</text><text class="t-meta" x="824" y="440">no approval</text><text class="t-meta" x="824" y="456">on record</text>
+
+            <g class="m m-O5"><circle class="ring" cx="515" cy="140" r="8"/><circle class="dot" cx="515" cy="140" r="2.5"/></g>
+            <text class="t-oid halo" x="506" y="110" text-anchor="end">O5</text>
+            <text class="t-tag halo" x="506" y="124" text-anchor="end">STALE_OBSERVATION</text>
+
+            <g class="m m-O1"><circle class="ring" cx="635" cy="140" r="8"/><circle class="dot" cx="635" cy="140" r="2.5"/></g>
+            <text class="t-oid halo" x="652" y="112">O1</text>
+            <text class="t-ok halo" x="652" y="126">no evidence gap</text>
+
+            <g class="m m-O4"><circle class="ring" cx="630" cy="260" r="8"/><circle class="dot" cx="630" cy="260" r="2.5"/></g>
+            <text class="t-oid halo" x="620" y="212" text-anchor="end">O4</text>
+            <text class="t-tag halo" x="620" y="228" text-anchor="end">OUTSIDE_APPROVAL_WINDOW</text>
+            <text class="t-tag halo" x="620" y="244" text-anchor="end">OWNER_MISSING</text>
+
+            <g class="m m-O2"><circle class="ring" cx="635" cy="380" r="8"/><circle class="dot" cx="635" cy="380" r="2.5"/></g>
+            <text class="t-oid halo" x="620" y="352" text-anchor="end">O2</text>
+            <text class="t-tag halo" x="620" y="368" text-anchor="end">NO_APPROVAL</text>
+
+            <g class="m m-O3"><circle class="ring" cx="635" cy="480" r="8"/><circle class="dot" cx="635" cy="480" r="2.5"/></g>
+            <text class="t-oid halo" x="620" y="452" text-anchor="end">O3</text>
+            <text class="t-tag halo" x="620" y="468" text-anchor="end">NO_APPROVAL · UNKNOWN_ASSET</text>
+          </g>
+        </svg>
+
+        <!-- Portrait drawing for phones: 4 units = 1 h; x 40 = 2026-11-01T00:00Z; snapshot x 280; stale edge x 184. -->
+        <svg class="sv sheet-p" viewBox="0 0 360 700" role="img" aria-labelledby="sheet-t-p sheet-d-p" focusable="false">
+          <title id="sheet-t-p">Reconciliation schematic of the synthetic golden fixture, stacked by asset and path</title>
+          <desc id="sheet-d-p">Four lanes on one UTC time scale, snapshot 3 November 12:00. Lane A1 and V1, approval P1 from 1 to 4 November: O5 at 2 November 11:00 is STALE_OBSERVATION; O1 at 3 November 11:00 has no evidence gap. Lane A2 and V2, approval P2 from 1 to 2 November, owner null: O4 at 3 November 10:00 is OUTSIDE_APPROVAL_WINDOW and OWNER_MISSING. Lane A1 and V9, no approval on record: O2 is NO_APPROVAL. Lane A9 and V9, A9 not in the asset register: O3 is NO_APPROVAL and UNKNOWN_ASSET.</desc>
+          <defs>
+            <pattern id="hatch-p" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="hatch" x1="0" y1="0" x2="0" y2="8"/></pattern>
+          </defs>
+
+          <g class="layer-time">
+            <rect class="frame" x="4" y="4" width="352" height="692"/>
+            <rect x="40" y="44" width="144" height="606" fill="url(#hatch-p)"/>
+            <line class="stale-edge" x1="184" y1="44" x2="184" y2="650"/>
+            <line class="axis" x1="40" y1="44" x2="328" y2="44"/>
+            <path class="axis" d="M40 44V52M136 44V52M232 44V52M328 44V52"/>
+            <text class="t-axis" x="40" y="66">11-01</text>
+            <text class="t-axis" x="136" y="66" text-anchor="middle">11-02</text>
+            <text class="t-axis" x="232" y="66" text-anchor="middle">11-03</text>
+            <text class="t-axis" x="328" y="66" text-anchor="end">11-04</text>
+            <line class="snap-line" x1="280" y1="32" x2="280" y2="650"/>
+            <text class="t-snap" x="280" y="26" text-anchor="middle">SNAPSHOT 11-03 12:00Z</text>
+            <text class="t-axis halo" x="44" y="644">OLDER THAN 86,400 s</text>
+            <path class="axis" d="M40 672H136M40 667V677M136 667V677"/>
+            <text class="t-axis" x="144" y="676">24 h · 4 units = 1 h</text>
+            <text class="t-syn" x="328" y="676" text-anchor="end">SYNTHETIC</text>
+          </g>
+
+          <g class="layer-reg">
+            <text class="t-lane halo" x="40" y="102">A1 / V1</text>
+            <text class="t-meta halo" x="328" y="102" text-anchor="end">owner Ops · P1</text>
+            <line class="reg-line" x1="40" y1="146" x2="328" y2="146"/>
+            <rect class="win" x="40" y="140" width="288" height="12"/>
+            <text class="t-win halo" x="40" y="128">P1 · 11-01 00:00Z to 11-04 00:00Z</text>
+
+            <text class="t-lane halo" x="40" y="242">A2 / V2</text>
+            <text class="t-meta halo" x="328" y="242" text-anchor="end">owner <tspan class="t-null">null</tspan> · P2</text>
+            <line class="reg-line" x1="40" y1="286" x2="328" y2="286"/>
+            <rect class="win" x="40" y="280" width="96" height="12"/>
+            <text class="t-win halo" x="40" y="268">P2 · 11-01 00:00Z to 11-02 00:00Z</text>
+          </g>
+
+          <g class="layer-imp">
+            <text class="t-lane halo" x="40" y="382">A1 / V9</text>
+            <text class="t-meta halo" x="328" y="382" text-anchor="end">no approval on record</text>
+            <path class="imp-line" d="M40 426H328"/>
+            <text class="t-lane halo" x="40" y="522">A9 / V9</text>
+            <text class="t-meta halo" x="328" y="522" text-anchor="end">A9 not in asset register</text>
+            <path class="imp-line" d="M40 566H328"/>
+
+            <g class="m m-O5"><circle class="ring" cx="180" cy="146" r="7"/><circle class="dot" cx="180" cy="146" r="2.2"/></g>
+            <text class="t-oid halo" x="172" y="174" text-anchor="end">O5</text>
+            <text class="t-tag halo" x="172" y="190" text-anchor="end">STALE_OBSERVATION</text>
+            <g class="m m-O1"><circle class="ring" cx="276" cy="146" r="7"/><circle class="dot" cx="276" cy="146" r="2.2"/></g>
+            <text class="t-oid halo" x="328" y="174" text-anchor="end">O1</text>
+            <text class="t-ok halo" x="328" y="190" text-anchor="end">no evidence gap</text>
+
+            <g class="m m-O4"><circle class="ring" cx="272" cy="286" r="7"/><circle class="dot" cx="272" cy="286" r="2.2"/></g>
+            <text class="t-oid halo" x="328" y="314" text-anchor="end">O4</text>
+            <text class="t-tag halo" x="328" y="330" text-anchor="end">OUTSIDE_APPROVAL_WINDOW</text>
+            <text class="t-tag halo" x="328" y="346" text-anchor="end">OWNER_MISSING</text>
+
+            <g class="m m-O2"><circle class="ring" cx="276" cy="426" r="7"/><circle class="dot" cx="276" cy="426" r="2.2"/></g>
+            <text class="t-oid halo" x="328" y="454" text-anchor="end">O2</text>
+            <text class="t-tag halo" x="328" y="470" text-anchor="end">NO_APPROVAL</text>
+
+            <g class="m m-O3"><circle class="ring" cx="276" cy="566" r="7"/><circle class="dot" cx="276" cy="566" r="2.2"/></g>
+            <text class="t-oid halo" x="328" y="594" text-anchor="end">O3</text>
+            <text class="t-tag halo" x="328" y="610" text-anchor="end">NO_APPROVAL</text>
+            <text class="t-tag halo" x="328" y="626" text-anchor="end">UNKNOWN_ASSET</text>
+          </g>
+        </svg>
+      </div>
+
+      <figcaption id="sheet-cap" class="titleblock">
+        <dl>
+          <div class="tb-wide"><dt>Sheet</dt><dd>AS-01 · Reconciliation schematic</dd></div>
+          <div><dt>Data</dt><dd>Synthetic golden fixture</dd></div>
+          <div><dt>Snapshot</dt><dd><time datetime="2026-11-03T12:00:00Z">2026-11-03T12:00:00Z</time></dd></div>
+          <div><dt>Rule pack</dt><dd><code>aqua-review-1</code>, fictional</dd></div>
+          <div><dt>Scale</dt><dd>UTC, linear, from fixture timestamps</dd></div>
+        </dl>
+      </figcaption>
+    </figure>
+
+    <section class="sec wrap" id="legend" aria-labelledby="legend-h">
+      <div class="sec-head reveal">
+        <p class="eyebrow">01 · Reading the sheet</p>
+        <h2 id="legend-h">Two layers, never merged.</h2>
+        <p>The register layer is what the utility's records say should exist. The imported layer is what an observation file says was seen. AquaSentinel compares them. It does not reconcile them into one picture, and it never edits either.</p>
+      </div>
+      <dl class="legend sec-body reveal">
+        <div><dt><svg class="glyph" viewBox="0 0 56 16" aria-hidden="true" focusable="false"><line class="reg-line" x1="2" y1="8" x2="54" y2="8"/></svg>Approved path</dt><dd>An approval record joins an asset to a path ID. Only P1 (A1 to V1) and P2 (A2 to V2) are on record.</dd></div>
+        <div><dt><svg class="glyph" viewBox="0 0 56 16" aria-hidden="true" focusable="false"><rect class="win" x="2" y="2" width="52" height="12"/></svg>Approval window</dt><dd>validFrom to validThrough, with both endpoints counted as inside.</dd></div>
+        <div><dt><svg class="glyph" viewBox="0 0 56 16" aria-hidden="true" focusable="false"><circle class="ring" cx="28" cy="8" r="6"/><circle class="dot" cx="28" cy="8" r="2"/></svg>Imported observation</dt><dd>One row from the observation file, placed at its observedAt.</dd></div>
+        <div><dt><svg class="glyph" viewBox="0 0 56 16" aria-hidden="true" focusable="false"><line class="imp-line" x1="2" y1="8" x2="54" y2="8"/></svg>Observed pairing</dt><dd>An asset and path seen together in an import with no approval on record for that exact pair.</dd></div>
+        <div><dt><svg class="glyph" viewBox="0 0 56 16" aria-hidden="true" focusable="false"><line class="snap-line" x1="28" y1="0" x2="28" y2="16"/><rect x="2" y="2" width="20" height="12" fill="url(#hatch-g)"/><defs><pattern id="hatch-g" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="hatch" x1="0" y1="0" x2="0" y2="6"/></pattern></defs></svg>Snapshot and stale zone</dt><dd>The snapshot is 2026-11-03T12:00:00Z. Hatching marks anything more than 86,400 seconds older. Exactly 86,400 seconds does not count as stale.</dd></div>
+      </dl>
+    </section>
+
+    <section class="sec wrap" id="schedule" aria-labelledby="schedule-h">
+      <div class="sec-head reveal">
+        <p class="eyebrow">02 · Observation schedule</p>
+        <h2 id="schedule-h">Five observations. Six evidence gaps.</h2>
+        <p>These values come from the hand-computed oracle in the slice specification. The workbench runs its engine on the same fixture, so its counts should read the same.</p>
+      </div>
+      <div class="sec-body reveal">
+        <dl class="totals">
+          <div><dt>observations</dt><dd>5</dd></div>
+          <div><dt>flagged</dt><dd>4</dd></div>
+          <div><dt>structurally consistent</dt><dd>1</dd></div>
+          <div><dt>evidence gaps</dt><dd>6</dd></div>
+        </dl>
+
+        <div class="sched-head" aria-hidden="true"><span>Obs.</span><span>Asset / path</span><span>observedAt</span><span>Age at snapshot</span><span>Evidence gaps</span></div>
+        <ol class="sched">
+          <li data-obs="O1"><span class="callout">O1</span><dl><div><dt>Asset / path</dt><dd>A1 / V1</dd></div><div><dt>observedAt</dt><dd><time datetime="2026-11-03T11:00:00Z">2026-11-03T11:00:00Z</time></dd></div><div><dt>Age</dt><dd>3,600 s</dd></div><div><dt>Evidence gaps</dt><dd class="none">none</dd></div></dl></li>
+          <li data-obs="O2"><span class="callout">O2</span><dl><div><dt>Asset / path</dt><dd>A1 / V9</dd></div><div><dt>observedAt</dt><dd><time datetime="2026-11-03T11:00:00Z">2026-11-03T11:00:00Z</time></dd></div><div><dt>Age</dt><dd>3,600 s</dd></div><div><dt>Evidence gaps</dt><dd><code class="tag">NO_APPROVAL</code></dd></div></dl></li>
+          <li data-obs="O3"><span class="callout">O3</span><dl><div><dt>Asset / path</dt><dd>A9 / V9</dd></div><div><dt>observedAt</dt><dd><time datetime="2026-11-03T11:00:00Z">2026-11-03T11:00:00Z</time></dd></div><div><dt>Age</dt><dd>3,600 s</dd></div><div><dt>Evidence gaps</dt><dd><code class="tag">NO_APPROVAL</code> <code class="tag">UNKNOWN_ASSET</code></dd></div></dl></li>
+          <li data-obs="O4"><span class="callout">O4</span><dl><div><dt>Asset / path</dt><dd>A2 / V2</dd></div><div><dt>observedAt</dt><dd><time datetime="2026-11-03T10:00:00Z">2026-11-03T10:00:00Z</time></dd></div><div><dt>Age</dt><dd>7,200 s</dd></div><div><dt>Evidence gaps</dt><dd><code class="tag">OUTSIDE_APPROVAL_WINDOW</code> <code class="tag">OWNER_MISSING</code></dd></div></dl></li>
+          <li data-obs="O5"><span class="callout">O5</span><dl><div><dt>Asset / path</dt><dd>A1 / V1</dd></div><div><dt>observedAt</dt><dd><time datetime="2026-11-02T11:00:00Z">2026-11-02T11:00:00Z</time></dd></div><div><dt>Age</dt><dd>90,000 s</dd></div><div><dt>Evidence gaps</dt><dd><code class="tag">STALE_OBSERVATION</code></dd></div></dl></li>
+        </ol>
+
+        <h3 class="tally-h">Rule pack <code>aqua-review-1</code>, count per rule</h3>
+        <ul class="tally">
+          <li class="zero"><span class="n">0</span><code>AMBIGUOUS_APPROVAL</code><span>More than one approval covers the observation</span></li>
+          <li><span class="n">2</span><code>NO_APPROVAL</code><span>No approval for the observed (assetId, pathId)</span></li>
+          <li><span class="n">1</span><code>OUTSIDE_APPROVAL_WINDOW</code><span>No approval window covers observedAt</span></li>
+          <li><span class="n">1</span><code>OWNER_MISSING</code><span>Observed asset has no recorded owner</span></li>
+          <li><span class="n">1</span><code>STALE_OBSERVATION</code><span>Observation older than the freshness threshold</span></li>
+          <li><span class="n">1</span><code>UNKNOWN_ASSET</code><span>Observed asset is absent from the register</span></li>
         </ul>
       </div>
-      <div>
-        <h2>What it does not do</h2>
-        <ul>
-          <li>No scanning, fetching, DNS lookups, device connections, PLC writes or remediation. URL-like identifiers are plain text.</li>
-          <li>No real infrastructure data. Fixtures are labelled synthetic; the only source of the rules is the slice specification.</li>
-          <li>No legal, regulatory, clinical or security-assurance claim. A missing observation never implies safety.</li>
-          <li>No accounts, tenants, uploads or deployment. Served on 127.0.0.1 only.</li>
-        </ul>
+    </section>
+
+    <section class="sec wrap" id="notes" aria-labelledby="notes-h">
+      <div class="sec-head reveal">
+        <p class="eyebrow">03 · General notes</p>
+        <h2 id="notes-h">Passive by construction.</h2>
+        <p>Every engineering sheet carries its general notes. These are the conditions under which the drawing above means anything.</p>
+      </div>
+      <div class="sec-body reveal">
+        <ol class="notes">
+          <li>Import only. This slice has no scanning, URL fetching, DNS lookups, device connections, PLC writes or remediation. URL-like identifiers stay plain text.</li>
+          <li>A finding describes a disagreement between records. It says nothing about exposure, severity, compromise or safety.</li>
+          <li>An absent observation is not evidence that anything is in order.</li>
+          <li>Identifiers are kept exactly as imported, apart from trimming surrounding ASCII whitespace. A collision caused by trimming is rejected. There are no guessed aliases, no inferred ports and no merging by name.</li>
+          <li>Any validation error rejects the whole import, and the previous dataset stays in place. Reviewer notes and dispositions sit in a separate layer and never rewrite imported evidence.</li>
+          <li>All data is synthetic, and the rule pack is fictional and illustrative. There is no regulatory, legal or compliance claim of any kind.</li>
+        </ol>
+        <h3 class="bounds-h">Import bounds</h3>
+        <dl class="bounds">
+          <div><dt>input</dt><dd>1 MiB</dd></div>
+          <div><dt>assets</dt><dd>1,000</dd></div>
+          <div><dt>approvals</dt><dd>2,000</dd></div>
+          <div><dt>observations</dt><dd>5,000</dd></div>
+          <div><dt>identifier</dt><dd>200 chars</dd></div>
+          <div><dt>note</dt><dd>2,000 chars</dd></div>
+          <div><dt>nesting depth</dt><dd>8</dd></div>
+          <div><dt>export</dt><dd>10 MiB</dd></div>
+        </dl>
       </div>
     </section>
 
-    <section class="card">
-      <h2>The synthetic golden fixture and its hand-computed oracle</h2>
-      <p class="muted">snapshotAt 2026-11-03T12:00:00Z. Assets A1 (owner Ops), A2 (owner null). Approvals P1 A1/V1 2026-11-01 → 2026-11-04; P2 A2/V2 2026-11-01 → 2026-11-02 (inclusive endpoints).</p>
-      <div class="table-wrap">
-        <table class="oracle">
-          <thead><tr><th>Observation</th><th>Asset / path</th><th>observedAt</th><th>Expected rule IDs</th></tr></thead>
-          <tbody>
-            <tr><td>O1</td><td>A1 / V1</td><td>2026-11-03T11:00:00Z</td><td>none</td></tr>
-            <tr><td>O2</td><td>A1 / V9</td><td>2026-11-03T11:00:00Z</td><td>NO_APPROVAL</td></tr>
-            <tr><td>O3</td><td>A9 / V9</td><td>2026-11-03T11:00:00Z</td><td>NO_APPROVAL, UNKNOWN_ASSET</td></tr>
-            <tr><td>O4</td><td>A2 / V2</td><td>2026-11-03T10:00:00Z</td><td>OUTSIDE_APPROVAL_WINDOW, OWNER_MISSING</td></tr>
-            <tr><td>O5</td><td>A1 / V1</td><td>2026-11-02T11:00:00Z</td><td>STALE_OBSERVATION</td></tr>
-          </tbody>
-        </table>
+    <section class="handoff" id="run" aria-labelledby="run-h">
+      <div class="wrap handoff-grid reveal">
+        <div>
+          <p class="eyebrow">04 · Into the workbench</p>
+          <h2 id="run-h">Check the sheet against the engine.</h2>
+          <p class="handoff-note">The workbench is a separate surface with paper-ledger styling for long review sessions. It runs entirely in your browser on the text you import.</p>
+        </div>
+        <div>
+          <ol class="steps">
+            <li>Open the workbench.</li>
+            <li>The golden fixture is selected by default. Press <strong>Load fixture</strong>.</li>
+            <li>The counts should read 5 observations, 4 flagged and 6 evidence gaps.</li>
+            <li>Open a finding on O3 to see the imported rows behind each reason.</li>
+          </ol>
+          <a class="cta cta-dark" href="./app/">Open the workbench <span class="arrow" aria-hidden="true">→</span></a>
+        </div>
       </div>
-      <p>Expected: 5 observations, 4 flagged, 1 structurally consistent, 6 findings. O5 is 90,000 seconds old; exactly 86,400 seconds is not stale.</p>
-    </section>
-
-    <section class="card">
-      <h2>Bounds</h2>
-      <p>1 MiB input · 1,000 assets · 2,000 approvals · 5,000 observations · 200-character identifiers · 2,000-character notes · nesting depth 8 · 10 MiB export. Timestamps must be real UTC calendar instants ending in <code>Z</code>; identifiers keep their exact text after ASCII-whitespace trimming, and trimming collisions are rejected.</p>
     </section>
   </main>
 
-  <footer class="colophon">
-    <p>Synthetic vertical slice. Dependency-free Node 24 ESM engine in <code>src/</code>; this page and the workbench import that same engine. Run <code>npm test</code> for the oracle and adversarial checks, <code>npm run serve</code> for this loopback-only preview.</p>
+  <footer class="colophon wrap">
+    <p>AquaSentinel vertical slice 0.1.0. Synthetic demo. This page uses no scripts, fonts or images, and its drawings are hand-set SVG from the golden fixture. The workbench imports the dependency-free engine in <code>src/</code>.</p>
   </footer>
 </body>
 </html>
