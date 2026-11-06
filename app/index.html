@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AquaSentinel workbench — synthetic evidence reconciliation</title>
+  <meta name="description" content="Passive reconciliation of imported synthetic asset, approval and observation records. Synthetic demo data only; no authority of any kind.">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body class="workbench">
+  <p class="banner" id="data-banner" role="status" data-provenance="none">Bundled fixtures are SYNTHETIC DEMO DATA; a local JSON file or pasted JSON is shown as UNVERIFIED USER-SUPPLIED DATA. Fictional rule pack aqua-review-1. Not a security assessment. No regulatory, legal or operational meaning.</p>
+
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">AquaSentinel · vertical slice</p>
+      <h1>Evidence <span class="tide">ledger</span></h1>
+      <p class="lede" id="notice"></p>
+    </div>
+    <nav aria-label="Site"><a href="../">About this slice</a></nav>
+  </header>
+
+  <main id="workbench" data-loaded="no">
+    <section class="card" aria-labelledby="import-h">
+      <h2 id="import-h"><span class="step">1</span> Import</h2>
+      <div class="import-grid">
+        <div>
+          <label for="fixture-select">Synthetic fixture</label>
+          <div class="row">
+            <select id="fixture-select"></select>
+            <button type="button" id="load-fixture">Load fixture</button>
+          </div>
+        </div>
+        <div>
+          <label for="input-file">JSON file (max 1 MiB, read locally)</label>
+          <input type="file" id="input-file" accept=".json,application/json">
+        </div>
+      </div>
+      <label for="input-text">Or paste the <code>aqua-demo-1</code> envelope</label>
+      <textarea id="input-text" rows="8" spellcheck="false" placeholder='{"schemaVersion":"aqua-demo-1","snapshotAt":"2026-11-03T12:00:00Z","assets":[],"approvals":[],"observations":[]}'></textarea>
+      <div class="row">
+        <button type="button" id="run-text" class="primary">Validate and run</button>
+        <p id="import-status" class="status" data-tone="neutral" aria-live="polite"></p>
+      </div>
+      <div id="errors" hidden>
+        <h3>Import rejected — every row/field problem found</h3>
+        <ul id="error-list" class="errors"></ul>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="summary-h">
+      <h2 id="summary-h"><span class="step">2</span> Counts</h2>
+      <p id="snapshot-line" class="muted"></p>
+      <dl id="summary-grid" class="stats"></dl>
+      <ul id="rule-counts" class="rules"></ul>
+    </section>
+
+    <section class="card" aria-labelledby="findings-h">
+      <h2 id="findings-h" tabindex="-1"><span class="step">3</span> Findings</h2>
+      <div class="filters">
+        <label>Rule <select id="filter-rule"></select></label>
+        <label>Entity text <input type="search" id="filter-query" placeholder="O3, A9, V1, finding id…" autocomplete="off"></label>
+        <label class="check"><input type="checkbox" id="filter-unknown"> Unknown assets only</label>
+        <label class="check"><input type="checkbox" id="filter-missing"> Missing approvals only</label>
+        <span id="findings-count" class="muted"></span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Finding</th><th>Rule</th><th>Observation</th><th>Asset</th><th>Path</th><th>Age</th><th>Disposition</th><th></th></tr>
+          </thead>
+          <tbody id="findings-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" id="evidence" aria-labelledby="evidence-h">
+      <h2 id="evidence-h"><span class="step">4</span> Evidence drill-down</h2>
+      <div id="evidence-body"></div>
+      <div id="review" hidden>
+        <h4>Review layer (separate from the frozen report)</h4>
+        <p id="decision-current" class="muted"></p>
+        <ul id="note-list" class="notes"></ul>
+        <div class="review-grid">
+          <label>Reviewer <input type="text" id="decision-reviewer" maxlength="200" autocomplete="off"></label>
+          <label>Disposition <select id="decision-select"></select></label>
+          <button type="button" id="decision-record">Record disposition</button>
+        </div>
+        <div class="review-grid">
+          <label>Author <input type="text" id="note-author" maxlength="200" autocomplete="off"></label>
+          <label class="grow">Note (max 2,000 chars) <textarea id="note-text" rows="2" maxlength="2000"></textarea></label>
+          <button type="button" id="note-add">Add note</button>
+        </div>
+        <p id="review-status" class="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="compare-h">
+      <h2 id="compare-h"><span class="step">5</span> Snapshot comparison</h2>
+      <div id="compare-body"></div>
+    </section>
+
+    <section class="card" aria-labelledby="export-h">
+      <h2 id="export-h"><span class="step">6</span> Export</h2>
+      <div class="row">
+        <button type="button" id="export-json" class="primary" disabled>Export JSON</button>
+        <button type="button" id="export-csv" disabled>Export safe CSV</button>
+        <p id="export-status" class="status" aria-live="polite"></p>
+      </div>
+      <p class="muted">JSON preserves exact identifiers and carries sourceHash, snapshot, rule version, findings, notes and decisions. CSV neutralizes formula-leading cells. Both are capped at 10 MiB.</p>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <p id="meta-versions"></p>
+    <p id="meta-provenance"></p>
+    <p id="meta-limits"></p>
+    <p>Passive import only: no scan, fetch, DNS lookup, PLC write or remediation exists in this slice. Served on 127.0.0.1 by scripts/serve.mjs.</p>
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
